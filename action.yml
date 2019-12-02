@@ -1,10 +1,13 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
-inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+name: 'Setup Terraform'
+description: 'Setup Terraform and add it to the PATH'
+author: 'volcano-coffee-company'
+branding:
+  icon: 'terminal'
+  color: 'purple'
+inputs: 
+  version:
+    description: 'The Terraform version to download (if necessary) and use. Example: ~> 0.12'
+    default: '0.12'
 runs:
   using: 'node12'
-  main: 'lib/main.js'
+  main: 'lib/setup-terraform.js'
