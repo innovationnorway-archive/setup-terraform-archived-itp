@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as util from 'util';
 import * as semver from 'semver';
 import * as restm from 'typed-rest-client/RestClient';
+import {Release, Version} from './interfaces';
 
 // os.arch and os.platform does not always match the download url
 const osPlat: string = os.platform() == 'win32' ? 'windows' : os.platform();
@@ -27,18 +28,18 @@ if (!tempDirectory) {
   tempDirectory = path.join(baseLocation, 'actions', 'temp');
 }
 
-export async function getTerraform(version: string) {
+export async function getTerraform(versionSpec: string) {
   // check cache
   let toolPath: string;
-  toolPath = tc.find('terraform', version);
+  toolPath = tc.find('terraform', versionSpec);
 
   // If not found in cache
   if (!toolPath) {
     // query releases.hashicorp.com for a matching version
-    version = await queryLatestMatch(version);
+    const version = await queryLatestMatch(versionSpec);
     if (!version) {
       throw new Error(
-        `Unable to find matching version for platform ${osPlat} and architecture ${osArch}.`
+        `Unable to find Terraform version '${versionSpec}' for platform ${osPlat} and architecture ${osArch}.`
       );
     }
 
@@ -64,7 +65,7 @@ async function acquireTerraform(version: string): Promise<string> {
   } catch (error) {
     core.debug(error);
 
-    throw 'Failed to get current version';
+    throw `Failed to download version ${version}: ${error}`;
   }
 
   //
@@ -81,36 +82,6 @@ async function acquireTerraform(version: string): Promise<string> {
   // Install into the local tool cache
   //
   return await tc.cacheDir(extPath, 'terraform', version);
-}
-
-//
-// Terraform versions interface
-// see https://releases.hashicorp.com/terraform/index.json
-//
-interface Build {
-  name: string;
-  version: string;
-  os: string;
-  arch: string;
-  filename: string;
-  url: string;
-}
-
-interface Version {
-  name: string;
-  version: string;
-  shasums: string;
-  shasums_signature: string;
-  builds: Build[];
-}
-
-interface Versions {
-  [version: string]: Version;
-}
-
-interface Release {
-  name: string;
-  versions: Versions;
 }
 
 async function queryLatestMatch(versionSpec: string): Promise<string> {
@@ -151,18 +122,8 @@ function getDownloadUrl(version: string): string {
 
 //
 // Lifted directly from @actions/tool-cache, assuming
-// these will be exported in a future version.
+// this will be exported in a future version.
 //
-function isExplicitVersion(versionSpec: string): boolean {
-  const c = semver.clean(versionSpec) || '';
-  core.debug(`isExplicit: ${c}`);
-
-  const valid = semver.valid(c) != null;
-  core.debug(`explicit? ${valid}`);
-
-  return valid;
-}
-
 function evaluateVersions(versions: string[], versionSpec: string): string {
   let version = '';
   core.debug(`evaluating ${versions.length} versions`);
