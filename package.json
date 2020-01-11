@@ -5,6 +5,7 @@
   "description": "setup terraform action",
   "main": "lib/setup-terraform.js",
   "scripts": {
+    "audit": "npm install && npm audit --audit-level=moderate",
     "build": "tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
