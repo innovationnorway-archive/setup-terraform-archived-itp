@@ -15,11 +15,11 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@master
+- uses: actions/checkout@v2
 - uses: volcano-coffee-company/setup-terraform@v1
   with:
-    version: '0.12'
-- run: terraform init
+    version: '~0.12'
+- run: terraform version
 ```
 
 # License
