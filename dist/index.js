@@ -4330,7 +4330,11 @@ function queryLatestMatch(versionSpec) {
             allowRetries: true,
             maxRetries: 3
         });
-        const response = yield http.get('https://releases.hashicorp.com/terraform/index.json');
+        const url = 'https://releases.hashicorp.com/terraform/index.json';
+        const response = yield http.get(url);
+        if (response.message.statusCode !== 200) {
+            throw new Error(`Failed to get releases from "${url}". Code: ${response.message.statusCode}, Message: ${response.message.statusMessage}`);
+        }
         const body = yield response.readBody();
         const release = JSON.parse(body);
         if (release && release.versions) {
