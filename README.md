@@ -1,7 +1,7 @@
 # setup-terraform
 
 <p align="left">
-  <a href="https://github.com/volcano-coffee-company/setup-terraform"><img alt="GitHub Actions status" src="https://github.com/volcano-coffee-company/setup-terraform/workflows/Main%20workflow/badge.svg"></a>
+  <a href="https://github.com/volcano-coffee-company/setup-terraform"><img alt="GitHub Actions status" src="https://github.com/volcano-coffee-company/setup-terraform/workflows/build-test/badge.svg"></a>
 </p>
 
 This action sets up a [Terraform](https://terraform.io) environment for use in actions by:

@@ -10,4 +10,4 @@ inputs:
     default: '0.12'
 runs:
   using: 'node12'
-  main: 'lib/setup-terraform.js'
+  main: 'dist/index.js'
