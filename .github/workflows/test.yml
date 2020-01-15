@@ -1,38 +1,26 @@
-name: Main workflow
-
-on: 
+name: "build-test"
+on: # rebuild any PRs and main branch changes
+  pull_request:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**.md'
-  pull_request:
-    paths-ignore:
-      - '**.md'
 
 jobs:
-  run:
-    name: Run
+  build: # make sure build/ci work properly
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
         operating-system: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Set Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-
-    - name: npm install
-      run: npm install
-
-    - name: Lint
-      run: npm run format-check
-
-    - name: npm audit
-      run: npm audit --audit-level=moderate
-
-    - name: npm test
-      run: npm test
+    - run: |
+        npm install
+        npm run all
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./
+      with: 
+        version: '0.12'
+    - run: terraform version
