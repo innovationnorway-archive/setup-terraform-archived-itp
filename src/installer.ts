@@ -34,12 +34,16 @@ async function queryLatestMatch(versionSpec: string): Promise<string> {
     allowRetries: true,
     maxRetries: 3
   })
-  const response: httpm.HttpClientResponse = await http.get(
-    'https://releases.hashicorp.com/terraform/index.json'
-  )
+  const url = 'https://releases.hashicorp.com/terraform/index.json'
+  const response: httpm.HttpClientResponse = await http.get(url)
+  if (response.message.statusCode !== 200) {
+    throw new Error(
+      `Failed to get releases from "${url}". Code: ${response.message.statusCode}, Message: ${response.message.statusMessage}`
+    )
+  }
+
   const body: string = await response.readBody()
   const release: Release | undefined = JSON.parse(body)
-
   if (release && release.versions) {
     for (const version of Object.values(release.versions)) {
       const supportedBuild = version.builds.find(
