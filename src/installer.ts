@@ -4,7 +4,7 @@ import * as os from 'os'
 import * as semver from 'semver'
 import * as util from 'util'
 import * as httpm from '@actions/http-client'
-import {Release} from './interfaces'
+import * as ifm from './interfaces'
 
 const osArch: string = translateOsArch(os.arch())
 const osPlat: string = translateOsPlatform(os.platform())
@@ -35,17 +35,11 @@ async function queryLatestMatch(versionSpec: string): Promise<string> {
     maxRetries: 3
   })
   const url = 'https://releases.hashicorp.com/terraform/index.json'
-  const response: httpm.HttpClientResponse = await http.get(url)
-  if (response.message.statusCode !== 200) {
-    throw new Error(
-      `Failed to get releases from "${url}". Code: ${response.message.statusCode}, Message: ${response.message.statusMessage}`
-    )
-  }
+  const response = await http.getJson<ifm.Product>(url)
 
-  const body: string = await response.readBody()
-  const release: Release | undefined = JSON.parse(body)
-  if (release && release.versions) {
-    for (const version of Object.values(release.versions)) {
+  const obj = response.result
+  if (obj && obj.versions) {
+    for (const version of Object.values(obj.versions)) {
       const supportedBuild = version.builds.find(
         build => osPlat === build.os && osArch === build.arch
       )
