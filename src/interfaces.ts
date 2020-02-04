@@ -23,7 +23,7 @@ export interface Versions {
   [version: string]: Version
 }
 
-export interface Release {
+export interface Product {
   name: string
   versions: Versions
 }
