@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/volcano-coffee-company/setup-terraform.git"
+    "url": "git+https://github.com/innovationnorway/setup-terraform.git"
   },
   "keywords": [
     "actions",
     "terraform",
     "setup"
   ],
-  "author": "volcano-coffee-company",
+  "author": "innovationnorway",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.4",
