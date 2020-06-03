@@ -1,7 +1,7 @@
 # setup-terraform
 
 <p align="left">
-  <a href="https://github.com/volcano-coffee-company/setup-terraform"><img alt="GitHub Actions status" src="https://github.com/volcano-coffee-company/setup-terraform/workflows/build-test/badge.svg"></a>
+  <a href="https://github.com/innovationnorway/setup-terraform"><img alt="GitHub Actions status" src="https://github.com/innovationnorway/setup-terraform/workflows/build-test/badge.svg"></a>
 </p>
 
 This action sets up a [Terraform](https://terraform.io) environment for use in actions by:
@@ -16,7 +16,7 @@ Basic:
 ```yaml
 steps:
 - uses: actions/checkout@v2
-- uses: volcano-coffee-company/setup-terraform@v1
+- uses: innovationnorway/setup-terraform@v1
   with:
     version: '~0.12'
 - run: terraform version
