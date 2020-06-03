@@ -7,7 +7,7 @@ branding:
 inputs: 
   version:
     description: 'The Terraform version to download (if necessary) and use. Example: ~> 0.12'
-    default: '0.12'
+    default: '>= 0.12'
 runs:
   using: 'node12'
   main: 'dist/index.js'
