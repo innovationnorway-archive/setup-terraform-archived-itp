@@ -49,6 +49,20 @@ describe('installer tests', () => {
     expect(thrown).toBe(true)
   })
 
+  it('Uses required Terraform version', async () => {
+    const terraformDir = path.join(toolDir, 'terraform', '0.12.26', os.arch())
+    await io.mkdirP(terraformDir)
+
+    await installer.getTerraform('')
+
+    expect(fs.existsSync(`${terraformDir}.complete`)).toBe(true)
+    if (IS_WINDOWS) {
+      expect(fs.existsSync(path.join(terraformDir, 'terraform.exe'))).toBe(true)
+    } else {
+      expect(fs.existsSync(path.join(terraformDir, 'terraform'))).toBe(true)
+    }
+  }, 100000)
+
   it('Uses version of terraform installed in cache', async () => {
     const terraformDir: string = path.join(
       toolDir,

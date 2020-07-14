@@ -3,7 +3,7 @@ import * as installer from './installer'
 
 async function run(): Promise<void> {
   try {
-    const version = core.getInput('version', {required: true})
+    const version = core.getInput('version')
     await installer.getTerraform(version)
   } catch (error) {
     core.setFailed(error.message)
