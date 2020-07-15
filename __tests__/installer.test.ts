@@ -5,10 +5,12 @@ import path = require('path')
 
 const toolDir = path.join(__dirname, 'runner', 'tools')
 const tempDir = path.join(__dirname, 'runner', 'temp')
+const fixturesDir = path.join(__dirname, '__fixtures__')
 
 process.env['RUNNER_TOOL_CACHE'] = toolDir
 process.env['RUNNER_TEMP'] = tempDir
 import * as installer from '../src/installer'
+import * as tfconfig from '../src/config'
 
 const IS_WINDOWS = process.platform === 'win32'
 
@@ -50,10 +52,13 @@ describe('installer tests', () => {
   })
 
   it('Uses required Terraform version', async () => {
+    const moduleDir = path.join(fixturesDir, '**/*.tf')
+    const versions = await tfconfig.getRequiredVersion(moduleDir)
+    const version = await installer.queryLatestMatch(versions.join(' '))
     const terraformDir = path.join(toolDir, 'terraform', '0.12.26', os.arch())
     await io.mkdirP(terraformDir)
 
-    await installer.getTerraform('')
+    await installer.getTerraform(version)
 
     expect(fs.existsSync(`${terraformDir}.complete`)).toBe(true)
     if (IS_WINDOWS) {

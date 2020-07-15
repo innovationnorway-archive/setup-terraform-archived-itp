@@ -1,25 +1,15 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
-import * as fs from 'fs'
 import * as os from 'os'
 import * as semver from 'semver'
 import * as util from 'util'
 import * as httpm from '@actions/http-client'
-import * as glob from '@actions/glob'
-import * as tfconfig from '@innovationnorway/terraform-config'
 import * as ifm from './interfaces'
 
 const osArch: string = translateOsArch(os.arch())
 const osPlat: string = translateOsPlatform(os.platform())
 
 export async function getTerraform(versionSpec: string): Promise<void> {
-  if (!versionSpec) {
-    const requiredVersions = await getRequiredVersions()
-    if (requiredVersions.length > 0) {
-      versionSpec = requiredVersions.join(' ')
-    }
-  }
-
   let toolPath: string
   toolPath = tc.find('terraform', versionSpec)
 
@@ -38,7 +28,7 @@ export async function getTerraform(versionSpec: string): Promise<void> {
   core.addPath(toolPath)
 }
 
-async function queryLatestMatch(versionSpec: string): Promise<string> {
+export async function queryLatestMatch(versionSpec: string): Promise<string> {
   const versions: string[] = []
   const http = new httpm.HttpClient('setup-terraform', [], {
     allowRetries: true,
@@ -140,23 +130,4 @@ export function evaluateVersions(
   }
 
   return version
-}
-
-export async function getRequiredVersions(): Promise<string[]> {
-  const versions: string[] = []
-  const globber = await glob.create('**/*.tf')
-
-  for await (const file of globber.globGenerator()) {
-    const src = fs.readFileSync(file)
-    const config = tfconfig.parse(file, src.toString())
-    if (config && Array.isArray(config.required_version)) {
-      for (const version of config.required_version) {
-        if (semver.valid(version) || semver.validRange(version)) {
-          versions.push(version)
-        }
-      }
-    }
-  }
-
-  return versions
 }

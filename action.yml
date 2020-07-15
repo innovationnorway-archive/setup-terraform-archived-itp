@@ -7,6 +7,10 @@ branding:
 inputs: 
   version:
     description: 'The Terraform version to download (if necessary) and use. Example: ~> 0.12'
+    default: '>= 0.12'
+  use-required-version:
+    description: 'Set this option if you want to use the required Terraform version.'
+    default: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

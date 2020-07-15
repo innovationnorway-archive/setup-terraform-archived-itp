@@ -3457,10 +3457,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const installer = __importStar(__webpack_require__(749));
+const tfconfig = __importStar(__webpack_require__(478));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const version = core.getInput('version');
+            let version = core.getInput('version');
+            if (core.getInput('use-required-version') === 'true') {
+                const requiredVersions = yield tfconfig.getRequiredVersion('**/*.tf');
+                if (requiredVersions.length < 0) {
+                    version = requiredVersions.join(' ');
+                }
+            }
             yield installer.getTerraform(version);
         }
         catch (error) {
@@ -4588,6 +4595,86 @@ function getState(name) {
 }
 exports.getState = getState;
 //# sourceMappingURL=core.js.map
+
+/***/ }),
+
+/***/ 478:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getRequiredVersion = void 0;
+const fs = __importStar(__webpack_require__(747));
+const semver = __importStar(__webpack_require__(876));
+const glob = __importStar(__webpack_require__(281));
+const tfconfig = __importStar(__webpack_require__(0));
+function getRequiredVersion(path) {
+    var e_1, _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const versions = [];
+        const globber = yield glob.create(path);
+        try {
+            for (var _b = __asyncValues(globber.globGenerator()), _c; _c = yield _b.next(), !_c.done;) {
+                const file = _c.value;
+                const src = fs.readFileSync(file);
+                const config = tfconfig.parse(file, src.toString());
+                if (config && Array.isArray(config.required_version)) {
+                    for (const version of config.required_version) {
+                        if (semver.valid(version) || semver.validRange(version)) {
+                            versions.push(version);
+                        }
+                    }
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        return versions;
+    });
+}
+exports.getRequiredVersion = getRequiredVersion;
+
 
 /***/ }),
 
@@ -8038,34 +8125,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRequiredVersions = exports.evaluateVersions = exports.getTerraform = void 0;
+exports.evaluateVersions = exports.queryLatestMatch = exports.getTerraform = void 0;
 const core = __importStar(__webpack_require__(470));
 const tc = __importStar(__webpack_require__(533));
-const fs = __importStar(__webpack_require__(747));
 const os = __importStar(__webpack_require__(87));
 const semver = __importStar(__webpack_require__(876));
 const util = __importStar(__webpack_require__(669));
 const httpm = __importStar(__webpack_require__(539));
-const glob = __importStar(__webpack_require__(281));
-const tfconfig = __importStar(__webpack_require__(0));
 const osArch = translateOsArch(os.arch());
 const osPlat = translateOsPlatform(os.platform());
 function getTerraform(versionSpec) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!versionSpec) {
-            const requiredVersions = yield getRequiredVersions();
-            if (requiredVersions.length > 0) {
-                versionSpec = requiredVersions.join(' ');
-            }
-        }
         let toolPath;
         toolPath = tc.find('terraform', versionSpec);
         if (!toolPath) {
@@ -8101,6 +8172,7 @@ function queryLatestMatch(versionSpec) {
         return evaluateVersions(versions, versionSpec);
     });
 }
+exports.queryLatestMatch = queryLatestMatch;
 function acquireTerraform(version) {
     return __awaiter(this, void 0, void 0, function* () {
         const downloadUrl = getDownloadUrl(version);
@@ -8167,36 +8239,6 @@ function evaluateVersions(versions, versionSpec) {
     return version;
 }
 exports.evaluateVersions = evaluateVersions;
-function getRequiredVersions() {
-    var e_1, _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const versions = [];
-        const globber = yield glob.create('**/*.tf');
-        try {
-            for (var _b = __asyncValues(globber.globGenerator()), _c; _c = yield _b.next(), !_c.done;) {
-                const file = _c.value;
-                const src = fs.readFileSync(file);
-                const config = tfconfig.parse(file, src.toString());
-                if (config && Array.isArray(config.required_version)) {
-                    for (const version of config.required_version) {
-                        if (semver.valid(version) || semver.validRange(version)) {
-                            versions.push(version);
-                        }
-                    }
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return versions;
-    });
-}
-exports.getRequiredVersions = getRequiredVersions;
 
 
 /***/ }),
