@@ -1,0 +1,22 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "terraform",
+            "pattern": [
+                {
+                    "regexp": "^(?:\\x1b\\[\\d+m)*(Error|Warning):\\s(?:\\x1b\\[\\d+m)*(.+?)(?:\\x1b\\[\\d+m)*$",
+                    "severity": 1,
+                    "message": 2
+                },
+                {
+                    "regexp": "^\\s*$"
+                },
+                {
+                    "regexp": "^(?:\\x1b\\[\\d+m)*\\s+on\\s(.+)\\sline\\s(\\d+).+:$",
+                    "file": 1,
+                    "line": 2
+                }
+            ]
+        }
+    ]
+}
